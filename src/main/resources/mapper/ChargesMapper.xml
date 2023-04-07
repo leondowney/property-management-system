@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.management.mapper.ChargesMapper">
+    <update id="updateCharge" parameterType="com.property.management.entity.Charge">
+        update db_charges set communituName = #{communituName},chargeNum = #{chargeNum}, chargeName = #{chargeName}, createDateTime= #{createDateTime} where id = #{id}
+    </update>
+    <delete id="deleteChargeById">
+        delete from db_charges where id =#{id}
+    </delete>
+    <delete id="deletedChargeByIds">
+        delete from db_charges where id in ${ids}
+    </delete>
+    <insert id="chargeInsert" parameterType="com.property.management.entity.Charge">
+       insert into db_charges (communituName, chargeNum, chargeName,createDateTime) values (#{communituName},#{chargeNum},#{chargeName},#{createDateTime})
+   </insert>
+    <select id="queryByName" resultType="com.property.management.entity.Charge">
+        select * from db_charges
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="chargeName != null and chargeName != ''">
+                and chargeName LIKE CONCAT(CONCAT('%',#{chargeName},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and createDateTime &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and createDateTime &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+    <select id="queryByNameCount" resultType="java.lang.Long">
+        select count(*)from db_charges
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="chargeName != null and chargeName != ''">
+                and chargeName LIKE CONCAT(CONCAT('%',#{chargeName},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and createDateTime &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and createDateTime &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+    <select id="queryById" resultType="com.property.management.entity.Charge">
+        select * from db_charges where id =#{id}
+    </select>
+    <select id="queryCommunityInfo" resultType="com.property.management.entity.Community">
+        select * from db_community
+    </select>
+</mapper>

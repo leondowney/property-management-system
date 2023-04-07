@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.management.mapper.HomeMapper">
+<resultMap id="HomeMap" type="home">
+    <id column="id" property="id"/>
+    <result column="cid" property="cid"/>
+    <result column="bid" property="bid"/>
+    <result column="code" property="code"/>
+    <result column="hname" property="hname"/>
+    <result column="ownerName" property="ownerName"/>
+    <result column="telephone" property="telephone"/>
+    <result column="roomNum" property="roomNum"/>
+    <result column="unit" property="unit"/>
+    <result column="floor" property="floor"/>
+    <result column="description" property="description"/>
+    <result column="liveTime" property="liveTime"/>
+    <association property="community" javaType="Community">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </association>
+    <association property="building" javaType="Building">
+        <id column="id" property="id"/>
+        <result column="bname" property="bname"/>
+    </association>
+
+</resultMap>
+    <insert id="insertHouse">
+        insert into db_house (cid,bid,code,hname,ownerName,telephone,roomNum,unit,floor,description,liveTime) values (#{cid},#{bid},#{code},#{hname},#{ownerName},#{telephone},#{roomNum},#{unit},#{floor},#{description},#{liveTime});
+    </insert>
+    <update id="updateHouse">
+        update db_house
+        <trim prefix="set" suffixOverrides=",">
+            <if test="cid!=null and cid != ''">cid=#{cid},</if>
+            <if test="bid!=null and bid != ''">bid=#{bid},</if>
+            <if test="code!=null and code != ''">code=#{code},</if>
+            <if test="hname!=null and hname != ''">hname=#{hname},</if>
+            <if test="ownerName!=null and ownerName != ''">ownerName=#{ownerName},</if>
+            <if test="telephone!=null and telephone != ''">telephone=#{telephone},</if>
+            <if test="roomNum!=null and roomNum != ''">roomNum=#{roomNum},</if>
+            <if test="unit!=null and unit != ''">unit=#{unit},</if>
+            <if test="floor!=null and floor != ''">floor=#{floor},</if>
+            <if test="description!=null and description != ''">description=#{description},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <delete id="deleteHouse">
+        delete from db_house where id = #{id}
+    </delete>
+    <delete id="deleteHouseMore">
+        delete from db_house where id in (${ids})
+
+    </delete>
+
+    <select id="query" resultMap="HomeMap">
+        SELECT
+        h.id,c.name,b.bname,h.code,h.hname,h.ownerName,h.telephone,h.roomNum,h.unit,h.floor,h.description,h.liveTime
+        FROM db_house h INNER JOIN db_building b ON h.bid=b.id INNER JOIN db_community c ON h.cid=c.id
+        <trim prefix="where" prefixOverrides="and||or">
+            c.`state`=1
+            <if test="houseName != null and houseName != ''">
+                and h.hname LIKE CONCAT(CONCAT('%',#{houseName},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and h.liveTime &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and h.liveTime &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+    <select id="queryCount" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM db_house h INNER JOIN db_building b ON h.bid=b.id INNER JOIN db_community c ON h.cid=c.id
+        <trim prefix="where" prefixOverrides="and||or">
+            c.`state`=1
+            <if test="houseName != null and houseName != ''">
+                and h.hname LIKE CONCAT(CONCAT('%',#{houseName},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and h.liveTime &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and h.liveTime &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+    <select id="queryCommunityInfo" resultType="com.property.management.entity.Community">
+        SELECT id,NAME FROM db_community
+        <where>
+            state=1
+            <if test="cid != null and cid != ''">
+                id=#{cid}
+            </if>
+        </where>
+    </select>
+    <select id="queryBuildingInfo" resultType="com.property.management.entity.Building">
+        SELECT id,bname FROM db_building
+        <where>
+            <if test="cid != null and cid != ''">
+                id=#{bid}
+            </if>
+        </where>
+
+    </select>
+    <select id="queryByid" resultType="com.property.management.entity.Home">
+
+        select * from db_house where id=#{id}
+    </select>
+
+</mapper>

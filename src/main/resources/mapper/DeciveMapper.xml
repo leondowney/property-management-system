@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.management.mapper.DeciveMapper">
+    <insert id="insertDecive" parameterType="com.property.management.entity.Device">
+        insert into db_device (conmunityName,deciveNum,deciveName,brand,price,`number`,purchaseDate,durationService,createTime) values (#{conmunityName},#{deciveNum},#{deciveName},#{brand},#{price},#{number},#{purchaseDate},#{durationService},#{createTime})
+    </insert>
+    <update id="updateDecive" parameterType="com.property.management.entity.Device">
+        update db_device set conmunityName = #{conmunityName },deciveNum = #{deciveNum},deciveName=#{deciveName},brand=#{brand},price=#{price},`number`=#{number},purchaseDate=#{purchaseDate},durationService=#{durationService},createTime = #{createTime} where id = #{id}
+    </update>
+    <delete id="deleteDeciveById">
+        delete from db_device where id=#{id}
+    </delete>
+    <delete id="deletedDeciveByIds">
+        delete from db_device where id in (${ids})
+    </delete>
+
+    <select id="queryByName" resultType="com.property.management.entity.Device">
+        select * from db_device
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="conmunityName != null and conmunityName != ''">
+                and conmunityName LIKE CONCAT(CONCAT('%',#{conmunityName},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and purchaseDate &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and purchaseDate &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+    <select id="queryByNameCount" resultType="java.lang.Long">
+        select
+        count(*)
+        from db_device
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="conmunityName != null and conmunityName != ''">
+                and conmunityName LIKE CONCAT(CONCAT('%',#{conmunityName},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and purchaseDate &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and purchaseDate &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+    <select id="queryById" resultType="com.property.management.entity.Device">
+        select * from db_device where id=#{id}
+    </select>
+    <select id="queryCommunityInfo" resultType="com.property.management.entity.Community">
+        select * from db_community
+    </select>
+</mapper>

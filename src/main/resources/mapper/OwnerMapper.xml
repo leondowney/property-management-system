@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.management.mapper.OwnerMapper">
+
+<!--手动配置映射 -->
+    <resultMap id="ownerMap" type="com.property.management.entity.Owner" autoMapping="true">
+        <result column="id" property="id"></result>
+        <result column="cid" property="cid"/>
+        <result column="hid" property="hid"/>
+        <result column="oname" property="oname"/>
+        <result column="picture" property="picture"/>
+        <result column="idcard" property="idcard"/>
+        <result column="telephone" property="telephone"/>
+        <result column="profession" property="profession"/>
+        <result column="sex" property="sex"/>
+        <result column="type" property="type"/>
+        <result column="remark" property="remark"/>
+        <result column="createTime" property="createTime"/>
+        <result column="birthday" property="birthday"/>
+
+        <association property="home">
+            <id property="id" column="id"></id>
+            <result property="hname" column="hname"></result>
+        </association>
+        <association property="community">
+            <id column="id" property="id"/>
+            <result property="name" column="name"></result>
+        </association>
+    </resultMap>
+
+
+    <!--    查询所有或者搜索-->
+    <select id="query" resultMap="ownerMap">
+        SELECT c.name,h.hname,o.* FROM db_owner o INNER JOIN db_community c ON o.cid=c.id INNER JOIN db_house h ON
+        o.hid=h.id
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="ownerName != null and ownerName != ''">
+                and o.oname LIKE CONCAT(CONCAT('%',#{ownerName},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and o.birthday &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and o.birthday &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+
+
+<!--分页查询 查询总条数-->
+
+    <select id="queryCount" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM db_owner o INNER JOIN db_community c ON o.cid=c.id INNER JOIN db_house h ON
+        o.hid=h.id
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="ownerName != null and ownerName != ''">
+                and o.oname LIKE CONCAT(CONCAT('%',#{ownerName},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and o.birthday &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and o.birthday &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+
+
+    <!--    根据id进行单个删除-->
+
+    <delete id="deleteById">
+delete from db_owner where id = #{id}
+    </delete>
+    <!--    根据ids进行批量删除-->
+    <delete id="deleteByIds">
+        delete from db_owner where id in (${ids})
+    </delete>
+
+
+    <!--根据id查询需要修改的数据 并进行回显-->
+    <!--业主-->
+    <select id="queryById" resultType="com.property.management.entity.Owner">
+        select * from db_owner where id =#{id}
+    </select>
+    <!--    查询小区-->
+    <select id="queryCommunityInfo" resultType="com.property.management.entity.Community">
+        SELECT id,NAME FROM db_community
+        <where>
+            state=1
+            <if test="cid != null and cid != ''">
+                id=#{cid}
+            </if>
+        </where>
+    </select>
+    <!--    查询房产-->
+    <select id="queryHouseInfo" resultType="Home"
+    >
+        SELECT id,hname FROM db_house
+        <where>
+            <if test="cid != null and cid != ''">
+                id=#{hid}
+            </if>
+        </where>
+    </select>
+
+
+<!--编辑信息 更新数据-->
+
+    <update id="updateOwner">
+    update db_owner
+    <trim prefix="set" suffixOverrides=",">
+        <if test="cid != null and cid !=''">cid=#{cid},</if>
+        <if test="hid != null and hid !=''">hid=#{hid},</if>
+        <if test="oname != null and oname !=''">oname=#{oname},</if>
+        <if test="picture != null and picture !=''">picture=#{picture},</if>
+        <if test="idcard != null and idcard !=''">idcard=#{idcard},</if>
+        <if test="telephone != null and telephone !=''">telephone=#{telephone},</if>
+        <if test="profession != null and profession !=''">profession =#{profession},</if>
+        <if test="sex != null and sex !=''">sex =#{sex},</if>
+        <if test="type != null and type !=''">type=#{type},</if>
+        <if test="remark != null and remark !=''">remark =#{remark},</if>
+        <if test="birthday!= null and birthday !=''">birthday =#{birthday},</if>
+
+    </trim>
+        where id =#{id}
+    </update>
+
+<!--    插入-->
+    <insert id="insert">
+    insert into db_owner (cid,hid,oname,picture,idcard,telephone,profession,sex,type,remark,createTime,birthday) values(#{cid},#{hid},#{oname},#{picture},#{idcard},#{telephone},#{profession},#{sex},#{type},#{remark},#{createTime},#{birthday})
+    </insert>
+
+
+
+
+
+
+
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

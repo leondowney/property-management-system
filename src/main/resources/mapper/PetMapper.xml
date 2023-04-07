@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.management.mapper.PetMapper">
+
+<!--    手动设置映射-->
+    <resultMap id="PetMap" type="Pet">
+        <id property="id" column="id"></id>
+        <result property="picture" column="picture"></result>
+        <result property="oid" column="oid"></result>
+        <result property="name" column="name"></result>
+        <result property="color" column="color"></result>
+        <result property="remark" column="remark"></result>
+        <result property="adoptTime" column="adoptTime"></result>
+
+        <association property="owner" javaType="Owner">
+            <id property="id" column="id"></id>
+            <result property="oname" column="oname"></result>
+        </association>
+    </resultMap>
+
+
+    <!--    //查询所有宠物-->
+    <select id="selectAllPet" resultMap="PetMap">
+        select p.*,o.oname from  db_pet p inner join db_owner o on p.oid=o.id
+        <trim prefix="where" prefixOverrides="and||or">
+
+            <if test="petName != null and petName != ''">
+                and p.name LIKE CONCAT(CONCAT('%',#{petName},'%'))
+            </if>
+
+            <if test="startTime != null and startTime != ''">
+                and p.adoptTime &gt;= #{startTime}
+            </if>
+
+            <if test="endTime != null and endTime != ''">
+                and p.adoptTime &lt;= #{endTime}
+            </if>
+
+        </trim>
+    </select>
+    <!-- 查询宠物总条数   -->
+    <select id="selectAllCount" resultType="java.lang.Long">
+    select count(*) from db_pet p inner join db_owner o on p.oid=o.id
+
+        <trim prefix="where" prefixOverrides="and||or">
+
+            <if test="petName != null and petName != ''">
+                and p.name LIKE CONCAT(CONCAT('%',#{petName},'%'))
+            </if>
+
+            <if test="startTime != null and startTime != ''">
+                and p.adoptTime &gt;= #{startTime}
+            </if>
+
+            <if test="endTime != null and endTime != ''">
+                and p.adoptTime &lt;= #{endTime}
+            </if>
+
+        </trim>
+    </select>
+
+
+
+    <!--    根据id进行单个删除-->
+    <delete id="deleteById">
+        delete from db_pet where id =#{id}
+    </delete>
+    <!--    根据ids进行批量删除-->
+    <delete id="deleteByIds">
+        delete from db_pet where id in (${ids})
+
+    </delete>
+
+
+<!--    //添加时渲染宠物主人下拉框-->
+    <select id="queryOwner" resultType="com.property.management.entity.Owner">
+        select oname,id from db_owner
+        <where>
+            <if test="cid != null and cid != ''">
+                id=#{oid}
+            </if>
+        </where>
+    </select>
+<!--查找宠物信息 编辑时回显数据-->
+    <select id="queryPetById" resultType="com.property.management.entity.Pet">
+        select * from db_pet where id = #{id}
+    </select>
+<!--插入宠物信息-->
+    <insert id="insert">
+        insert into db_pet (oid,picture,name,color,remark,adoptTime) values (#{oid},#{picture},#{name},#{color},#{remark},#{adoptTime})
+    </insert>
+
+
+<!--更新数据-->
+    <update id="update">
+    update db_pet
+    <trim prefix="set" suffixOverrides=",">
+        <if test="oid!=null and oid !=''">
+            oid=#{oid},
+        </if>
+        <if test="picture !=null and picture !=''">
+            picture=#{picture},
+        </if>
+
+        <if test="name!=null and name!=''">
+            name=#{name},
+        </if>
+        <if test="color !=null and color !=''">
+            color=#{color},
+        </if>
+        <if test="remark != null and remark !=''">
+            remark =#{remark},
+        </if>
+
+        <if test="adoptTime != null ">
+            adoptTime=#{adoptTime},
+        </if>
+    </trim>
+    where id = #{id}
+
+    </update>
+
+
+
+
+
+
+
+
+
+
+</mapper>

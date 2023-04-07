@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.management.mapper.LetterBoxMapper">
+    <insert id="addOne">
+        insert into letterbox (xiaoqu,letter_source,letter_name,state)
+        values(#{xiaoQu},#{letterSource},#{letterName},#{state})
+    </insert>
+    <update id="updateOne">
+        update letterbox set xiaoqu=#{xiaoQu},letter_source=#{letterSource},letter_name=#{letterName},
+        state=#{state} where id=#{id}
+    </update>
+    <delete id="deleteOne">
+        delete from letterbox where id=#{id}
+    </delete>
+    <delete id="deleteById">
+        delete from letterbox where id=#{parseInt}
+    </delete>
+    <select id="selectAll" resultType="com.property.management.entity.LetterBoxEntity">
+        select * from letterbox
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="letterBoxName != null and letterBoxName != ''">
+                and letter_source LIKE concat(concat('%',#{letterBoxName},'%'))
+            </if>
+        </trim>
+    </select>
+    <select id="selectCount" resultType="java.lang.Integer">
+        select count(*) from letterbox
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="letterBoxName != null and letterBoxName != ''">
+                and letter_source LIKE concat(concat('%',#{letterBoxName},'%'))
+            </if>
+        </trim>
+    </select>
+    <select id="selectId" resultType="com.property.management.entity.LetterBoxEntity">
+        select * from letterbox where id=#{id}
+    </select>
+</mapper>

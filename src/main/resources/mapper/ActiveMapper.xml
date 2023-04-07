@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.management.mapper.ActiveMapper">
+    <select id="selectAll" resultType="com.property.management.entity.ActiveEntity">
+        select * from active
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="activeName != null and activeName != ''">
+                and active_name LIKE concat(concat('%',#{activeName},'%'))
+            </if>
+        </trim>
+    </select>
+    <select id="selectCount" resultType="int">
+        select count(*) from active
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="activeName != null and activeName != ''">
+                and active_name LIKE concat(concat('%',#{activeName},'%'))
+            </if>
+        </trim>
+    </select>
+    <delete id="deleteOne" parameterType="int">
+        delete from active where id = #{id}
+    </delete>
+    <insert id="addOne" parameterType="com.property.management.entity.ActiveEntity">
+        insert into active (xiaoQu,active_name,active_path,active_master,start_time,end_time,state,active_body)
+        values(#{xiaoQu},#{activeName},#{activePath},#{activeMaster},#{startTime},#{endTime},#{state},#{activeBody})
+    </insert>
+    <select id="selectId" resultType="com.property.management.entity.ActiveEntity">
+        select * from active where id = ${id}
+    </select>
+    <update id="updateOne" parameterType="com.property.management.entity.ActiveEntity">
+        update active set xiaoqu=#{xiaoQu},active_name=#{activeName},active_path=#{activePath},active_master=#{activeMaster},
+         start_time=#{startTime},end_time=#{endTime},state=#{state},active_body=#{activeBody} where id=#{id}
+    </update>
+    <delete id="deleteById" parameterType="int">
+        delete from active where id = #{parseInt}
+    </delete>
+</mapper>

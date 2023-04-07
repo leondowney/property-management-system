@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.management.mapper.ParkingusageMapper">
+
+    <resultMap id="ParkingusageMap" type="com.property.management.entity.TbParkingUse">
+        <id column="id" property="id"/>
+        <result column="car_number" property="carNumber"/>
+        <result column="owner_name" property="ownerName"/>
+        <result column="telephone" property="telephone"/>
+        <result column="use_type" property="useType"/>
+        <result column="money" property="money"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="create_time" property="createTime"/>
+        <association property="community" javaType="Community">
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+        </association>
+        <association property="dbPark" javaType="DbPark">
+            <id column="id" property="id"/>
+            <result column="parkNum" property="parkNum"/>
+        </association>
+    </resultMap>
+    <insert id="parkingusageInsert">
+        insert into tb_parking_use  (id,cid,aid,car_number,owner_name,telephone,use_type,money,start_time,end_time,create_time) values (#{id},#{cid},#{aid},#{carNumber},#{ownerName},#{telephone},#{useType},#{money},#{startTime},#{endTime},#{createTime})
+    </insert>
+    <delete id="deleteparkingusageById">
+        delete from tb_parking_use where id =#{id}
+    </delete>
+    <delete id="deleteparkingusageByIds">
+        delete from tb_parking_use where id in (${ids})
+    </delete>
+
+    <select id="query" resultMap="ParkingusageMap">
+        SELECT t.id
+        ,c.`name`,p.parkNum,t.car_number,t.owner_name,t.telephone,t.use_type,t.money,t.start_time,t.end_time,t.create_time
+        FROM tb_parking_use t INNER JOIN db_community c ON t.cid = c.id INNER JOIN db_park p ON t.aid=p.id
+        <trim prefix="where" prefixOverrides="and||or">
+
+            <if test="carNumber != null and carNumber != ''">
+                and t.car_number LIKE CONCAT(CONCAT('%',#{carNumber},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and t.create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and t.create_time &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+    <select id="queryCount" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM tb_parking_use t INNER JOIN
+        db_community c ON t.cid = c.id INNER JOIN db_park p ON t.aid=p.id
+        <trim prefix="where" prefixOverrides="and||or">
+
+            <if test="carNumber != null and carNumber != ''">
+                and t.car_number LIKE CONCAT(CONCAT('%',#{carNumber},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and t.create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and t.create_time &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+    <select id="queryCommunityInfo" resultType="com.property.management.entity.Community">
+        SELECT id,NAME FROM db_community
+        <where>
+
+            <if test="cid != null and cid != ''">
+                id=#{cid}
+            </if>
+        </where>
+    </select>
+    <select id="queryDbparkInfo" resultType="com.property.management.entity.DbPark">
+        select id,parkNum from db_park
+        <where>
+            <if test="aid != null and aid != ''">
+                id=#{aid}
+            </if>
+        </where>
+    </select>
+    <update id="parkingusageUpate" parameterType="tbParkingUse">
+        update tb_parking_use
+        <set>
+
+            <if test="cid!=null and cid != ''">cid=#{cid},</if>
+            <if test="aid!=null and aid != ''">aid=#{aid},</if>
+            <if test="carNumber!=null and carNumber != ''">car_number=#{carNumber},</if>
+            <if test="telephone!=null and telephone != ''">telephone=#{telephone},</if>
+            <if test="useType!=null and useType != ''">use_type=#{useType},</if>
+            <if test="money!=null and money != ''">money=#{money},</if>
+            start_time=#{startTime},
+            end_time=${endTime}
+        </set>
+        where id = #{id}
+    </update>
+    <select id="queryId" resultType="com.property.management.entity.TbParkingUse">
+        select *
+        from tb_parking_use
+        where id = #{id}
+    </select>
+</mapper>

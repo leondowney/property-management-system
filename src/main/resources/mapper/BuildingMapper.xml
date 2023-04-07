@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.management.mapper.BuildingMapper">
+    <resultMap id="BuildingMap" type="com.property.management.entity.Building">
+        <id column="id" property="id"/>
+        <result column="buildingNum" property="buildingNum"/>
+        <result column="bname" property="bname"/>
+        <result column="roomNum" property="roomNum"/>
+        <result column="buildingDesc" property="buildingDesc"/>
+        <result column="buildHiredate" property="buildHiredate"/>
+        <result column="cid" property="cid"/>
+        <association property="community" javaType="Community">
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+        </association>
+    </resultMap>
+    <insert id="insertBuilding">
+        insert into db_building (buildingNum,bname,roomNum,buildingDesc,buildHiredate,cid) values (#{buildingNum},#{bname},#{roomNum},#{buildingDesc},#{buildHiredate},#{cid});
+
+    </insert>
+    <update id="buildingUpdate">
+        update db_building
+        <trim prefix="set" suffixOverrides=",">
+            <if test="cid!=null and cid != ''">cid=#{cid},</if>
+            <if test="buildingNum!=null and buildingNum != ''">buildingNum=#{buildingNum},</if>
+            <if test="bname!=null and bname != ''">bname=#{bname},</if>
+            <if test="roomNum!=null and roomNum != ''">roomNum=#{roomNum},</if>
+            <if test="buildingDesc!=null and buildingDesc != ''">buildingDesc=#{buildingDesc},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <delete id="deleteBuildingById">
+        delete from db_building where id = #{id}
+    </delete>
+    <delete id="deleteBuildingByIds">
+        delete from db_building where id in (${ids})
+    </delete>
+
+    <select id="query" resultMap="BuildingMap">
+        SELECT b.id,c.name,b.bname,b.buildingNum,b.roomnum,b.buildingDesc,b.buildHiredate FROM db_community c INNER JOIN
+        db_building b ON c.id=b.cid
+        <trim prefix="where" prefixOverrides="and||or">
+            and c.`state`=1
+            <if test="buildingName != null and buildingName != ''">
+                and b.bname LIKE CONCAT(CONCAT('%',#{buildingName},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and b.buildHiredate &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and b.buildHiredate &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+    <select id="queryCount" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM db_community c INNER JOIN
+        db_building b ON c.id=b.cid
+        <trim prefix="where" prefixOverrides="and||or">
+            and c.`state`=1
+            <if test="buildingName != null and buildingName != ''">
+                and b.bname LIKE CONCAT(CONCAT('%',#{buildingName},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and b.buildHiredate &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and b.buildHiredate &lt;= #{endTime}
+            </if>
+        </trim>
+
+    </select>
+    <select id="queryCommunityInfo" resultType="com.property.management.entity.Community">
+        SELECT id,NAME FROM db_community
+        <where>
+            state=1
+            <if test="cid != null and cid != ''">
+                and id=#{cid}
+            </if>
+        </where>
+    </select>
+    <select id="queryById" resultType="com.property.management.entity.Building">
+        select id,buildingNum,bname,roomNum,buildingDesc,buildHiredate,cid from db_building where id=#{id}
+    </select>
+</mapper>

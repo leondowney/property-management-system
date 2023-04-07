@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.management.mapper.UserMapper">
+    <update id="userUpdate" parameterType="com.property.management.entity.User">
+        update sys_user
+        <set>
+            <if test="password != 'd41d8cd98f00b204e9800998ecf8427e' and password != ''">
+                password = #{password},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="email != null and email != ''">
+                email = #{email},
+            </if>
+            <if test="img != null and img != ''">
+                img = #{img},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <select id="login" resultType="com.property.management.entity.User">
+        select * from sys_user where username=#{username} and password=#{password}
+    </select>
+
+
+    <insert id="insertUser">
+        insert into  sys_user ( username, realname ,password,phone,email,hiredate,type,img,available)
+
+    values ( #{username},#{realname},#{password},#{phone},#{email},#{hiredate},#{type},#{img},#{available})
+    </insert>
+
+</mapper>

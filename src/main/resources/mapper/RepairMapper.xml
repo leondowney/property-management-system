@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.management.mapper.RepairMapper">
+    <insert id="addOne">
+        insert into repair (xiaoqu,repair_personnel,repair_thing,repair_description,state)
+        values(#{xiaoQu},#{repairPersonnel},#{repairThing},#{repairDescription},#{state})
+    </insert>
+    <update id="updateOne">
+        update repair set xiaoqu=#{xiaoQu},repair_personnel=#{repairPersonnel},repair_thing=#{repairThing},
+        repair_description=#{repairDescription},state=#{state} where id=#{id}
+    </update>
+    <delete id="deleteOne">
+        delete from repair where id=#{id}
+    </delete>
+    <delete id="deleteById">
+        delete from repair where id = #{parseInt}
+    </delete>
+    <select id="selectCount" resultType="java.lang.Integer">
+        select count(*) from repair
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="repairName != null and repairName != ''">
+                and repair_personnel LIKE concat(concat('%',#{repairName},'%'))
+            </if>
+        </trim>
+    </select>
+    <select id="selectAll" resultType="com.property.management.entity.RepairEntity">
+        select * from repair
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="repairName != null and repairName != ''">
+                and repair_personnel LIKE concat(concat('%',#{repairName},'%'))
+            </if>
+        </trim>
+    </select>
+    <select id="selectId" resultType="com.property.management.entity.RepairEntity">
+        select * from repair where id=#{id}
+    </select>
+</mapper>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.management.mapper.ParkMapper">
+
+
+<!--    手动设置映射-->
+    <resultMap id="parkMap" type="Park">
+        <id property="id" column="id"></id>
+        <result property="parkName" column="parkName"></result>
+        <result property="parkNum" column="parkNum"></result>
+        <result property="craterTime" column="craterTime"></result>
+        <result property="state" column="state"></result>
+
+        <association property="community" javaType="Community">
+            <id column="id" property="id"></id>
+            <result property="name" column="name"></result>
+        </association>
+
+    </resultMap>
+
+<!--    添加操作-->
+    <insert id="insertInfo">
+        insert into db_park(zid,parkNum,parkName,craterTime,state)values (#{zid},#{parkNum},#{parkName},#{craterTime},#{state})
+    </insert>
+
+
+<!--    更新操作-->
+    <update id="updatePark">
+        update db_park set zid=#{zid},parkNum=#{parkNum},parkName=#{parkName},state=#{state} where id=#{id}
+<!--        <trim prefix="set" suffixOverrides=",">-->
+<!--            <if test="zid!=null">zid=#{zid},</if>-->
+<!--            <if test="parkNum!=null">parkNum=#{parkNum},</if>-->
+<!--            <if test="parkName!=null">parkName=#{parkName},</if>-->
+<!--            <if test="craterTime!=null">craterTime=#{craterTime},</if>-->
+<!--            <if test="state!=null">state=#{state},</if>-->
+<!--        </trim>-->
+<!--        where id = #{id}-->
+    </update>
+
+    <!--    单个删除-->
+    <delete id="deleteById">
+        delete from db_park where id in (${id})
+    </delete>
+
+
+
+    <!--    批量删除-->
+    <delete id="deleteByIds">
+         delete from db_park where id in (${ids})
+    </delete>
+
+
+
+
+
+    <!--查询小区渲染下拉框-->
+    <select id="queryCommunityInfo" resultType="com.property.management.entity.Community">
+        select id,name from db_community
+        <where>
+            <if test="zid !=null and zid != ''">
+                id=#{zid}
+            </if>
+        </where>
+    </select>
+
+
+
+
+    <select id="queryByName" resultMap="parkMap">
+        select p.id ,parkName,parkNum,p.state,c.name ,craterTime from db_park p left JOIN db_community c on
+        p.zid = c.id
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="parkName != null and parkName != ''">
+                and parkName LIKE CONCAT('%',#{parkName},'%')
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and craterTime &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and craterTime &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+
+
+    <!--模糊查询-->
+    <select id="queryByNameCount" resultType="java.lang.Long">
+        select count(*) from db_park p INNER JOIN db_community c on
+        p.zid = c.id
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="parkName !=null and parkName != ''">
+                and name like CONCAT(CONCAT('%',#{parkName},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and hiredate &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and hiredate &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+
+
+    <select id="queryById" resultType="com.property.management.entity.Community">
+        select
+                id,name ,
+                from db_community
+                where id = #{id}
+    </select>
+    <select id="queryId" resultType="com.property.management.entity.Park">
+        select * from db_park where id=#{id};
+    </select>
+
+    <!--    进行update之前先进行查询-->
+<!--    <select id="queryById" resultType="com.property.management.entity.Park">-->
+<!--        select-->
+<!--        id,zid,parkNum,parkName,craterTime,state-->
+<!--        from db_park-->
+<!--        where id = #{id}-->
+<!--    </select>-->
+
+
+</mapper>

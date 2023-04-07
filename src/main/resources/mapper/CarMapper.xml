@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.management.mapper.CarMapper">
+
+    
+<!--手动设置映射-->
+<!--    <resultMap id="carMap" type="Car" autoMapping="true">-->
+<!--        <id property="id" column="id"/>-->
+<!--        <result property="oid" column="oid"/>-->
+<!--        <result property="carNumber" column="carNumber"/>-->
+<!--        <result property="color" column="color"/>-->
+<!--        <result property="picture" column="picture"/>-->
+<!--        <result property="remark" column="remark"/>-->
+<!--        <result property="createTime" column="createTime"/>-->
+
+<!--        <association property="owner" javaType="Owner">-->
+<!--            <id property="id" column="id"/>-->
+<!--            <result property="oname" column="oname"/>-->
+<!--        </association>-->
+<!--    </resultMap>-->
+
+<!--手动设置映射-->
+    <resultMap id="CarMap" type="Car">
+        <id column="id" property="id"/>
+        <result column="picture" property="picture"/>
+        <result column="oid" property="oid"/>
+        <result column="color" property="color"/>
+        <result column="carNumber" property="carNumber"/>
+        <result column="remark" property="remark"/>
+        <result column="createTime" property="createTime"/>
+
+        <association property="owner" javaType="Owner">
+            <id column="id" property="id"/>
+            <result column="oname" property="oname"/>
+        </association>
+
+    </resultMap>
+
+
+
+    <!--查询所有、搜索-->
+    <select id="queryAll" resultMap="CarMap">
+    select o.oname,car.* from db_car car inner join db_owner o on car.oid=o.id
+    <trim prefix="where" prefixOverrides="and||or">
+        <if test="carNumber!=null and carNumber!=''">
+            and car.carNumber like concat(concat('%',#{carNumber},'%'))
+        </if>
+
+        <if test="startTime !=null and startTime !=''">
+            and car.createTime &gt;= #{startTime}
+        </if>
+        <if test="endTime !=null and endTime !=''">
+            and car.createTime &lt;= #{endTime}
+        </if>
+    </trim>
+    </select>
+
+<!--    查询总条数-->
+    <select id="queryCount" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM db_car car INNER JOIN db_owner o ON car.oid=o.id
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="carNumber != null and carNumber != ''">
+                and car.carNumber LIKE CONCAT(CONCAT('%',#{carNumber},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and car.createTime &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and car.createTime &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+
+
+    <!--    根据id进行单个删除-->
+    <delete id="deleteById">
+        delete from db_car where id = #{id}
+    </delete>
+
+<!--    根据ids进行批量删除-->
+    <delete id="deleteByIds">
+        delete from db_car where id in (${ids})
+    </delete>
+
+<!--    添加和编辑共用的一个查询车主信息方法-->
+    <select id="queryOwnerInfo" resultType="com.property.management.entity.Owner">
+        select id,oname  from db_owner
+        <where>
+            <if test="cid != null and cid != ''">
+                id=#{oid}
+            </if>
+        </where>
+    </select>
+
+<!--    //编辑时查询车辆信息-->
+    <select id="queryCarInfo" resultType="com.property.management.entity.Car">
+        select * from db_car where id =#{id}
+    </select>
+
+<!--增加车子信息-->
+    <insert id="insert">
+        insert into db_car (oid,carNumber,color,picture,remark,createTime) values (#{oid},#{carNumber},#{color},#{picture},#{remark},#{createTime})
+    </insert>
+
+
+<!--更新车子信息-->
+    <update id="updateCar">
+        update db_car
+        <trim prefix="set" suffixOverrides=",">
+            <if test="oid != null and oid != ''">oid=#{oid},</if>
+            <if test="carNumber != null and carNumber != ''">carNumber=#{carNumber},</if>
+            <if test="color != null and color != ''">color=#{color},</if>
+            <if test="picture != null and picture != ''">picture=#{picture},</if>
+            <if test="remark != null and remark != ''">remark=#{remark},</if>
+            <if test="createTime != null and createTime!= ''">createTime=#{createTime},</if>
+        </trim>
+    where id =#{id}
+    </update>
+
+<!--    <update id="updateCar">-->
+<!--        update db_car-->
+<!--        <trim prefix="set" suffixOverrides=",">-->
+<!--            <if test="oid!=null and oid != ''">oid=#{oid},</if>-->
+<!--            <if test="picture!=null and picture != ''">picture=#{picture},</if>-->
+<!--            <if test="color!=null and color != ''">color=#{color},</if>-->
+<!--            <if test="carNumber!=null and carNumber != ''">carNumber=#{carNumber},</if>-->
+<!--            <if test="createTime!=null and createTime != ''">createTime=#{createTime},</if>-->
+<!--            <if test="remark!=null and remark != ''">remark=#{remark},</if>-->
+<!--        </trim>-->
+<!--        where id = #{id}-->
+<!--    </update>-->
+
+
+
+
+</mapper>

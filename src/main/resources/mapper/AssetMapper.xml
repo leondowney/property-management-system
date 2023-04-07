@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.property.management.mapper.AssetMapper">
+    <insert id="insertAsset" parameterType="com.property.management.entity.Asset">
+        insert into db_asset (communityName,rateName,owner,amount,figure,figureDate,remark,createDate) values (#{communityName},#{rateName},#{owner},#{amount},#{figure},#{figureDate},#{remark},#{createDate})
+    </insert>
+    <update id="updateAsset" parameterType="com.property.management.entity.Asset">
+        update db_asset set communityName=#{communityName},rateName=#{rateName},owner=#{owner},amount=#{amount},figure=#{figure},figureDate=#{figureDate},remark=#{remark},createDate=#{createDate} where id= #{id}
+    </update>
+    <delete id="deleteAssetById">
+        delete from db_asset where id = #{id}
+    </delete>
+    <delete id="deleteAssetByIds">
+        delete from db_asset id in ${ids}
+    </delete>
+    <select id="queryByName" resultType="com.property.management.entity.Asset">
+        select * from db_asset
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="rateName != null and rateName != ''">
+                and rateName LIKE CONCAT(CONCAT('%',#{rateName},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and figureDate &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and figureDate &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+    <select id="queryByNameCount" resultType="java.lang.Long">
+        select count(*) from db_asset
+        <trim prefix="where" prefixOverrides="and||or">
+            <if test="rateName != null and rateName != ''">
+                and rateName LIKE CONCAT(CONCAT('%',#{rateName},'%'))
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and figureDate &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and figureDate &lt;= #{endTime}
+            </if>
+        </trim>
+    </select>
+    <select id="queryAssetInfoById" resultType="com.property.management.entity.Asset">
+        select * from db_asset where id = #{id}
+    </select>
+    <select id="queryAll" resultType="com.property.management.entity.Charge">
+        select * from db_charges
+    </select>
+    <select id="selectRate" resultType="com.property.management.entity.Charge">
+        select * from db_charges where communituName = #{cName}
+    </select>
+</mapper>
